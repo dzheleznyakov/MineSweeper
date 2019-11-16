@@ -1,9 +1,8 @@
-package zh.learn.board
+package zh.games.minesweeper.board
 
-import zh.learn.board.Direction.UP
-import zh.learn.board.Direction.DOWN
-import zh.learn.board.Direction.LEFT
-import kotlin.math.min
+import zh.games.minesweeper.board.Direction.UP
+import zh.games.minesweeper.board.Direction.DOWN
+import zh.games.minesweeper.board.Direction.LEFT
 
 fun createSquareBoard(width: Int): SquareBoard = SquareBoardImpl(width)
 fun <T> createGameBoard(width: Int): GameBoard<T> = GameBoardImpl(createSquareBoard(width))

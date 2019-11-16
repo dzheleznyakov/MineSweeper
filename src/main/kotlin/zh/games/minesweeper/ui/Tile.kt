@@ -1,4 +1,4 @@
-package zh.learn.ui
+package zh.games.minesweeper.ui
 
 import javafx.beans.property.IntegerProperty
 import javafx.beans.property.SimpleBooleanProperty
@@ -14,8 +14,8 @@ import javafx.scene.layout.StackPane
 import javafx.scene.paint.Color
 import javafx.scene.text.Font
 import javafx.scene.text.FontWeight
-import zh.learn.board.Status
-import zh.learn.game.Game
+import zh.games.minesweeper.board.Status
+import zh.games.minesweeper.game.Game
 
 val DEFAULT_BACKGROUND = Background(BackgroundFill(Color.LIGHTSKYBLUE, CornerRadii(2.0), null))
 val BACKGROUNDS = mapOf(

@@ -1,4 +1,4 @@
-package zh.learn.board
+package zh.games.minesweeper.board
 
 import org.junit.Assert
 import org.junit.Test

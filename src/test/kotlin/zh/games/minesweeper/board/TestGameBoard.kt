@@ -1,7 +1,6 @@
-package zh.learn.board
+package zh.games.minesweeper.board
 
 import org.junit.Assert
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.FixMethodOrder
 import org.junit.Test

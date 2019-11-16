@@ -1,4 +1,4 @@
-package zh.learn.board
+package zh.games.minesweeper.board
 
 import org.junit.Assert
 import org.junit.Assert.assertEquals
@@ -6,10 +6,10 @@ import org.junit.Assert.assertTrue
 import org.junit.FixMethodOrder
 import org.junit.Test
 import org.junit.runners.MethodSorters
-import zh.learn.board.Direction.UP
-import zh.learn.board.Direction.DOWN
-import zh.learn.board.Direction.LEFT
-import zh.learn.board.Direction.RIGHT
+import zh.games.minesweeper.board.Direction.UP
+import zh.games.minesweeper.board.Direction.DOWN
+import zh.games.minesweeper.board.Direction.LEFT
+import zh.games.minesweeper.board.Direction.RIGHT
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class TestSquareBoard {

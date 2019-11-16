@@ -11,13 +11,15 @@ repositories {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    implementation "io.reactivex:rxjava:1.2.9"
+    compile group: 'io.reactivex.rxjava2', name: 'rxjava', version: '2.2.14'
+    compile group: 'io.reactivex', name: 'rxjavafx', version: '2.0.2'
+
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
 compileKotlin {
-    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.jvmTarget = "11"
 }
 compileTestKotlin {
-    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.jvmTarget = "11"
 }

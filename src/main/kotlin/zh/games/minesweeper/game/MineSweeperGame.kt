@@ -1,9 +1,9 @@
-package zh.learn.game
+package zh.games.minesweeper.game
 
-import zh.learn.board.Cell
-import zh.learn.board.MineSweeperBoard
-import zh.learn.board.Status
-import zh.learn.board.createMineSweeperBoard
+import zh.games.minesweeper.board.Cell
+import zh.games.minesweeper.board.MineSweeperBoard
+import zh.games.minesweeper.board.Status
+import zh.games.minesweeper.board.createMineSweeperBoard
 
 fun newMineSweeperGame(width: Int = 10, mineLimit: Int = 10, initializer: MineSweeperGameInitializer): Game
         = MineSweeperGame(width, mineLimit, initializer)

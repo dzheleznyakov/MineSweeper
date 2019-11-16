@@ -1,4 +1,4 @@
-package zh.learn.game
+package zh.games.minesweeper.game
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull

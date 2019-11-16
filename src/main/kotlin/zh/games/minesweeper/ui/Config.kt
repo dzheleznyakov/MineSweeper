@@ -1,4 +1,4 @@
-package zh.learn.ui
+package zh.games.minesweeper.ui
 
 import javafx.beans.property.DoubleProperty
 import javafx.beans.property.SimpleDoubleProperty

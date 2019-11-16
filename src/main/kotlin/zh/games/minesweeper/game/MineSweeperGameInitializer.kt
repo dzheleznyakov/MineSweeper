@@ -1,7 +1,7 @@
-package zh.learn.game
+package zh.games.minesweeper.game
 
-import zh.learn.board.Cell
-import zh.learn.board.MineSweeperBoard
+import zh.games.minesweeper.board.Cell
+import zh.games.minesweeper.board.MineSweeperBoard
 import kotlin.random.Random
 
 interface MineSweeperGameInitializer {

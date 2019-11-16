@@ -1,7 +1,7 @@
-package zh.learn.game
+package zh.games.minesweeper.game
 
-import zh.learn.board.Cell
-import zh.learn.board.Status
+import zh.games.minesweeper.board.Cell
+import zh.games.minesweeper.board.Status
 
 interface Game {
     fun initialize()

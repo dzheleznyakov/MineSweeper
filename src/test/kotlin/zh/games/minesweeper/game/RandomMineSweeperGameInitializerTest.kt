@@ -1,10 +1,10 @@
-package zh.learn.game
+package zh.games.minesweeper.game
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import zh.learn.board.Cell
+import zh.games.minesweeper.board.Cell
 
 class RandomMineSweeperGameInitializerTest : AbstractMineSweeperGameTest() {
     @Test

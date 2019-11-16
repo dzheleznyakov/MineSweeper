@@ -1,5 +1,8 @@
-package zh.learn.ui
+package zh.games.minesweeper.ui
 
+import io.reactivex.Observable
+import io.reactivex.disposables.Disposable
+import io.reactivex.rxjavafx.schedulers.JavaFxScheduler
 import javafx.application.Application
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleIntegerProperty
@@ -12,6 +15,7 @@ import javafx.scene.Scene
 import javafx.scene.control.Label
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.GridPane
+import javafx.scene.layout.HBox
 import javafx.scene.layout.StackPane
 import javafx.scene.paint.Color
 import javafx.scene.shape.Rectangle
@@ -19,10 +23,11 @@ import javafx.scene.text.Font
 import javafx.scene.text.FontWeight
 import javafx.scene.text.Text
 import javafx.stage.Stage
-import zh.learn.board.Cell
-import zh.learn.game.Game
-import zh.learn.game.RandomMineSweeperGameInitializer
-import zh.learn.game.newMineSweeperGame
+import zh.games.minesweeper.board.Cell
+import zh.games.minesweeper.game.Game
+import zh.games.minesweeper.game.RandomMineSweeperGameInitializer
+import zh.games.minesweeper.game.newMineSweeperGame
+import java.util.concurrent.TimeUnit
 
 class PlayMineSweeperGame: Application() {
     companion object {
@@ -31,12 +36,16 @@ class PlayMineSweeperGame: Application() {
             launch(PlayMineSweeperGame::class.java)
         }
     }
+
     private val width = 10
     private val mineLimit = 10
     private val game: Game = newMineSweeperGame(width, mineLimit, RandomMineSweeperGameInitializer)
     private val hasExploded = SimpleBooleanProperty(false)
     private val hasWon = SimpleBooleanProperty(false)
     private val secureCount = SimpleIntegerProperty(mineLimit)
+    private val gameStarted = SimpleBooleanProperty(false)
+
+    private var timerSubscription: Disposable? = null
 
     override fun init() {
         game.initialize()
@@ -46,10 +55,19 @@ class PlayMineSweeperGame: Application() {
         val grid = getGrid()
 
         val mineCounter = getMineCounter()
+        val timer = getTimer()
+        val statContainer = HBox(10.0, mineCounter, timer)
+
         val gridContainer = StackPane(grid)
+        gridContainer.setOnMouseClicked { _ -> if (!gameStarted.get()) {
+            gameStarted.set(true)
+            timerSubscription = Observable.interval(1, TimeUnit.SECONDS)
+                .observeOn(JavaFxScheduler.platform())
+                .subscribe { timer.text = "$it" }
+        } }
 
         val root = BorderPane().apply {
-            top = mineCounter
+            top = statContainer
             center = gridContainer
         }
         BorderPane.setAlignment(mineCounter, Pos.CENTER)
@@ -100,11 +118,15 @@ class PlayMineSweeperGame: Application() {
         font = Font.font("Arial", FontWeight.BOLD, null, 20.0)
     }
 
-    private fun listenToHasExploded(gridContainer: StackPane) = hasExploded
-        .addListener { _, _, newValue -> if (newValue) setEndPanel(gridContainer, "Game Over!") }
+    private fun listenToHasExploded(gridContainer: StackPane) {
+        hasExploded.addListener { _, _, newValue -> if (newValue) setEndPanel(gridContainer, "Game Over!") }
+        timerSubscription?.dispose()
+    }
 
-    private fun listenToHasWon(gridContainer: StackPane) = hasWon
-        .addListener { _, _, newValue -> if (newValue) setEndPanel(gridContainer, "You Won!") }
+    private fun listenToHasWon(gridContainer: StackPane) {
+        hasWon.addListener { _, _, newValue -> if (newValue) setEndPanel(gridContainer, "You Won!") }
+        timerSubscription?.dispose()
+    }
 
     private fun setEndPanel(gridContainer: StackPane, endPanelText: String) {
         val rect = Rectangle().apply {
@@ -123,6 +145,8 @@ class PlayMineSweeperGame: Application() {
         }
         gridContainer.children.addAll(rect, textBackground, text)
     }
+
+    private fun getTimer(): Label = Label("0")
 }
 
 fun GridPane.add(tile: Tile) = add(tile, tile.row, tile.col)
