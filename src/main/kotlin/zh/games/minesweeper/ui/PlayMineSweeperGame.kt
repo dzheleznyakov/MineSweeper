@@ -9,6 +9,7 @@ import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.Node
 import javafx.scene.Scene
+import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.GridPane
@@ -35,23 +36,26 @@ class PlayMineSweeperGame: Application() {
 
     private val width = 10
     private val mineLimit = 10
-    private val game: Game = newMineSweeperGame(width, mineLimit, RandomMineSweeperGameInitializer)
+    private var game: Game = newMineSweeperGame(width, mineLimit, RandomMineSweeperGameInitializer)
     private val hasExploded = SimpleBooleanProperty(false)
     private val hasWon = SimpleBooleanProperty(false)
     private val secureCount = SimpleIntegerProperty(mineLimit)
     private val gameStarted = SimpleBooleanProperty(false)
 
+    private val backdrop = StackPane()
+    private var grid = getGrid()
+
     private val timer: Timer = Timer()
+    private val startBtn: Button = Button("Start")
 
     override fun init() {
         game.initialize()
     }
 
     override fun start(stage: Stage) {
-        val grid = getGrid()
-
         val mineCounter = getMineCounter()
-        val statContainer = HBox(10.0, mineCounter, timer)
+        val statContainer = HBox(10.0, mineCounter, startBtn, timer)
+            .apply { alignment = Pos.CENTER }
 
         val gridContainer = StackPane(grid)
         gridContainer.setOnMouseClicked { _ -> if (!gameStarted.get()) gameStarted.set(true) }
@@ -66,6 +70,7 @@ class PlayMineSweeperGame: Application() {
         listenToHasExploded(gridContainer)
         listenToHasWon(gridContainer)
         listenToGameStarted()
+        listenToStartButtonHit(gridContainer)
 
         with(stage) {
             scene = Scene(root)
@@ -138,13 +143,32 @@ class PlayMineSweeperGame: Application() {
             stroke = Color.BLACK
             strokeWidth = 2.0
         }
-        gridContainer.children.addAll(rect, textBackground, text)
+        backdrop.children.setAll(rect, textBackground, text)
+        gridContainer.children.addAll(backdrop)
     }
 
     private fun listenToGameStarted() {
         gameStarted.addListener { _, _, newValue ->
             if (newValue && !hasWon.get() && !hasExploded.get()) timer.start()
             else timer.stop()
+        }
+    }
+
+    private fun listenToStartButtonHit(gridContainer: StackPane) {
+        startBtn.setOnAction { _ ->
+            hasWon.set(false)
+            hasExploded.set(false)
+            game = newMineSweeperGame(width, mineLimit, RandomMineSweeperGameInitializer)
+                .apply { initialize() }
+            secureCount.set(mineLimit)
+            gameStarted.set(false)
+            timer.reset()
+            with(getGrid()) {
+                gridContainer.children.remove(grid)
+                grid = this
+                gridContainer.children.add(grid)
+            }
+            gridContainer.children.remove(backdrop)
         }
     }
 }

@@ -16,9 +16,10 @@ class Timer : StackPane() {
     private var time: LongProperty = SimpleLongProperty(0)
     private var timerSubscription: Disposable? = null
     private val timer = Observable.interval(1, TimeUnit.SECONDS)
+    private val timerLbl: Label
 
     init {
-        val timerLbl = Label().apply {
+            timerLbl = Label().apply {
             padding = Insets(5.0)
             style = "-fx-border-color: black; -fx-border-width: 1px"
             text = formatTime(0)
@@ -47,5 +48,10 @@ class Timer : StackPane() {
     fun stop() {
         timerSubscription?.dispose()
         timerSubscription = null
+    }
+
+    fun reset() {
+        stop()
+        timerLbl.text = formatTime(0L)
     }
 }
