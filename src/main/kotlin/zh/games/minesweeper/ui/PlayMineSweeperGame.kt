@@ -1,8 +1,5 @@
 package zh.games.minesweeper.ui
 
-import io.reactivex.Observable
-import io.reactivex.disposables.Disposable
-import io.reactivex.rxjavafx.schedulers.JavaFxScheduler
 import javafx.application.Application
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleIntegerProperty
@@ -27,7 +24,6 @@ import zh.games.minesweeper.board.Cell
 import zh.games.minesweeper.game.Game
 import zh.games.minesweeper.game.RandomMineSweeperGameInitializer
 import zh.games.minesweeper.game.newMineSweeperGame
-import java.util.concurrent.TimeUnit
 
 class PlayMineSweeperGame: Application() {
     companion object {
@@ -45,7 +41,7 @@ class PlayMineSweeperGame: Application() {
     private val secureCount = SimpleIntegerProperty(mineLimit)
     private val gameStarted = SimpleBooleanProperty(false)
 
-    private var timerSubscription: Disposable? = null
+    private val timer: Timer = Timer()
 
     override fun init() {
         game.initialize()
@@ -55,16 +51,10 @@ class PlayMineSweeperGame: Application() {
         val grid = getGrid()
 
         val mineCounter = getMineCounter()
-        val timer = getTimer()
         val statContainer = HBox(10.0, mineCounter, timer)
 
         val gridContainer = StackPane(grid)
-        gridContainer.setOnMouseClicked { _ -> if (!gameStarted.get()) {
-            gameStarted.set(true)
-            timerSubscription = Observable.interval(1, TimeUnit.SECONDS)
-                .observeOn(JavaFxScheduler.platform())
-                .subscribe { timer.text = "$it" }
-        } }
+        gridContainer.setOnMouseClicked { _ -> if (!gameStarted.get()) gameStarted.set(true) }
 
         val root = BorderPane().apply {
             top = statContainer
@@ -75,6 +65,7 @@ class PlayMineSweeperGame: Application() {
 
         listenToHasExploded(gridContainer)
         listenToHasWon(gridContainer)
+        listenToGameStarted()
 
         with(stage) {
             scene = Scene(root)
@@ -119,13 +110,17 @@ class PlayMineSweeperGame: Application() {
     }
 
     private fun listenToHasExploded(gridContainer: StackPane) {
-        hasExploded.addListener { _, _, newValue -> if (newValue) setEndPanel(gridContainer, "Game Over!") }
-        timerSubscription?.dispose()
+        hasExploded.addListener { _, _, newValue ->
+            if (newValue) setEndPanel(gridContainer, "Game Over!")
+            gameStarted.set(false)
+        }
     }
 
     private fun listenToHasWon(gridContainer: StackPane) {
-        hasWon.addListener { _, _, newValue -> if (newValue) setEndPanel(gridContainer, "You Won!") }
-        timerSubscription?.dispose()
+        hasWon.addListener { _, _, newValue ->
+            if (newValue) setEndPanel(gridContainer, "You Won!")
+            gameStarted.set(false)
+        }
     }
 
     private fun setEndPanel(gridContainer: StackPane, endPanelText: String) {
@@ -146,7 +141,12 @@ class PlayMineSweeperGame: Application() {
         gridContainer.children.addAll(rect, textBackground, text)
     }
 
-    private fun getTimer(): Label = Label("0")
+    private fun listenToGameStarted() {
+        gameStarted.addListener { _, _, newValue ->
+            if (newValue && !hasWon.get() && !hasExploded.get()) timer.start()
+            else timer.stop()
+        }
+    }
 }
 
 fun GridPane.add(tile: Tile) = add(tile, tile.row, tile.col)

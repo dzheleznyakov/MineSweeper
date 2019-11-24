@@ -136,5 +136,6 @@ class Tile(
             secureCount.set(secureCount.get() - 1)
         else
             secureCount.set(secureCount.get() + 1)
+        if (hasWon()) hasWon.set(true)
     }
 }
