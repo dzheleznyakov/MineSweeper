@@ -1,4 +1,4 @@
-package zh.games.minesweeper.ui
+package zh.games.minesweeper.ui.menu.settings
 
 enum class DifficultyLevel(
     val text: String,

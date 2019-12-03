@@ -1,12 +1,10 @@
-package zh.games.minesweeper.ui
+package zh.games.minesweeper.ui.menu.settings
 
-import javafx.beans.property.SimpleIntegerProperty
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.Scene
 import javafx.scene.control.Button
 import javafx.scene.control.Label
-import javafx.scene.control.Menu
 import javafx.scene.control.MenuItem
 import javafx.scene.control.RadioButton
 import javafx.scene.control.TextField
@@ -15,26 +13,16 @@ import javafx.scene.layout.GridPane
 import javafx.scene.layout.HBox
 import javafx.stage.Modality
 import javafx.stage.Stage
-import zh.games.minesweeper.ui.DifficultyLevel.EASY
-import zh.games.minesweeper.ui.DifficultyLevel.HARD
-import zh.games.minesweeper.ui.DifficultyLevel.MODERATE
+import zh.games.minesweeper.ui.config.ConfigInstance as Config
+import zh.games.minesweeper.ui.menu.settings.DifficultyLevel.EASY
 
-class SettingsMenu : Menu("Settings") {
-    val width = SimpleIntegerProperty()
-    val height  = SimpleIntegerProperty()
-    val mineLimit = SimpleIntegerProperty()
-
+class DifficultyItem : MenuItem("Difficulty") {
     private val widthTf = TextField().apply { prefColumnCount = 3 }
     private val heightTf = TextField().apply { prefColumnCount = 3 }
     private val mineLimitTf = TextField().apply { prefColumnCount = 3 }
 
     init {
         setLevel(EASY)
-        val difficultyItem = getDifficultyMenuItem()
-        items.addAll(difficultyItem)
-    }
-
-    private fun getDifficultyMenuItem(): MenuItem {
         val easyButton = RadioButton().apply { selectedProperty().set(true) }
         val moderateButton = RadioButton()
         val hardButton = RadioButton()
@@ -57,8 +45,7 @@ class SettingsMenu : Menu("Settings") {
             alignment = Pos.BOTTOM_RIGHT
         }
 
-        val difficultyItem = MenuItem("Difficulty")
-        difficultyItem.setOnAction {
+        setOnAction {
             val grid = GridPane().apply {
                 vgap = 10.0
                 hgap = 5.0
@@ -66,8 +53,8 @@ class SettingsMenu : Menu("Settings") {
 
                 easyButton.toggleGroup = toggleGroup
                 addRow(0, easyButton, Label(EASY.text))
-                addRow(1, moderateButton, Label(MODERATE.text))
-                addRow(2, hardButton, Label(HARD.text))
+                addRow(1, moderateButton, Label(DifficultyLevel.MODERATE.text))
+                addRow(2, hardButton, Label(DifficultyLevel.HARD.text))
                 addRow(3, customButton, Label("Custom"))
                 add(customContainer, 1, 4);
                 add(buttonBox, 1, 5)
@@ -79,29 +66,25 @@ class SettingsMenu : Menu("Settings") {
                 title = "Choose Difficulty Level"
                 show()
             }
-            cancelBtn.setOnAction {
-                stage.hide()
-            }
+
+            cancelBtn.setOnAction { stage.hide() }
             okBtn.setOnAction {
                 when {
                     easyButton.isSelected -> setLevel(EASY)
-                    moderateButton.isSelected -> setLevel(MODERATE)
-                    hardButton.isSelected -> setLevel(HARD)
-                    else -> {
-                        width.set(widthTf.text.toInt())
-                        height.set(heightTf.text.toInt())
-                        mineLimit.set(mineLimitTf.text.toInt())
-                    }
+                    moderateButton.isSelected -> setLevel(DifficultyLevel.MODERATE)
+                    hardButton.isSelected -> setLevel(DifficultyLevel.HARD)
+                    else -> setLevel(widthTf.text.toInt(), heightTf.text.toInt(), mineLimitTf.text.toInt())
                 }
                 stage.hide()
             }
         }
-        return difficultyItem
     }
 
-    private fun setLevel(level: DifficultyLevel) = with(level) {
-        this@SettingsMenu.width.set(width)
-        this@SettingsMenu.height.set(height)
-        this@SettingsMenu.mineLimit.set(mineLimit)
+    private fun setLevel(level: DifficultyLevel) = with(level) { setLevel(height, width, mineLimit) }
+
+    private fun setLevel(height: Int, width: Int, mineLimit: Int) = with(Config) {
+        this.height.set(height)
+        this.width.set(width)
+        this.mineLimit.set(mineLimit)
     }
 }

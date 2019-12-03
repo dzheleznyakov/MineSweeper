@@ -22,6 +22,8 @@ import javafx.scene.text.Text
 import javafx.stage.Stage
 import zh.games.minesweeper.game.RandomMineSweeperGameInitializer
 import zh.games.minesweeper.game.newMineSweeperGame
+import zh.games.minesweeper.ui.config.ConfigInstance as Config
+import zh.games.minesweeper.ui.menu.settings.SettingsMenu
 
 class PlayMineSweeperGame: Application() {
     companion object {
@@ -32,9 +34,9 @@ class PlayMineSweeperGame: Application() {
     }
 
     private val settingsMenu = SettingsMenu()
-    private var height = SimpleIntegerProperty().apply { bind(settingsMenu.height) }
-    private var width = SimpleIntegerProperty().apply { bind(settingsMenu.width) }
-    private val mineLimit = SimpleIntegerProperty().apply { bind(settingsMenu.mineLimit) }
+    private var height = SimpleIntegerProperty().apply { bind(Config.height) }
+    private var width = SimpleIntegerProperty().apply { bind(Config.width) }
+    private val mineLimit = SimpleIntegerProperty().apply { bind(Config.mineLimit) }
     private val hasExploded = SimpleBooleanProperty(false)
     private val hasWon = SimpleBooleanProperty(false)
     private val secureCount = SimpleIntegerProperty(mineLimit.get())

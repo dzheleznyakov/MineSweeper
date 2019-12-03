@@ -16,6 +16,7 @@ import javafx.scene.text.Font
 import javafx.scene.text.FontWeight
 import zh.games.minesweeper.board.Status
 import zh.games.minesweeper.game.Game
+import zh.games.minesweeper.ui.config.ConfigInstance
 
 val DEFAULT_BACKGROUND = Background(BackgroundFill(Color.LIGHTSKYBLUE, CornerRadii(2.0), null))
 val BACKGROUNDS = mapOf(

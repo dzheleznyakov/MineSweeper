@@ -9,6 +9,7 @@ import javafx.scene.Node
 import javafx.scene.layout.GridPane
 import zh.games.minesweeper.board.Cell
 import zh.games.minesweeper.game.Game
+import zh.games.minesweeper.ui.config.ConfigInstance
 
 class Grid(
     private val hasExploded: SimpleBooleanProperty,
