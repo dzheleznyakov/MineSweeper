@@ -43,7 +43,8 @@ class PlayMineSweeperGame: Application() {
     private val gameStarted = SimpleBooleanProperty(false)
 
     private val backdrop = StackPane()
-    private var grid = getGrid()
+    private val gridContainer = StackPane()
+    private var grid = Grid(hasExploded, hasWon, secureCount, width)
 
     private val timer: Timer = Timer()
     private val startBtn: Button = Button("Start")
@@ -57,7 +58,8 @@ class PlayMineSweeperGame: Application() {
         val statContainer = HBox(10.0, mineCounter, startBtn, timer)
             .apply { alignment = Pos.CENTER }
 
-        val gridContainer = StackPane(grid)
+        grid.setGame(game)
+        gridContainer.children.add(grid)
         gridContainer.setOnMouseClicked { _ -> if (!gameStarted.get()) gameStarted.set(true) }
 
         val root = BorderPane().apply {
@@ -70,7 +72,7 @@ class PlayMineSweeperGame: Application() {
         listenToHasExploded(gridContainer)
         listenToHasWon(gridContainer)
         listenToGameStarted()
-        listenToStartButtonHit(gridContainer)
+        listenToStartButtonHit()
 
         with(stage) {
             scene = Scene(root)
@@ -154,7 +156,7 @@ class PlayMineSweeperGame: Application() {
         }
     }
 
-    private fun listenToStartButtonHit(gridContainer: StackPane) {
+    private fun listenToStartButtonHit() {
         startBtn.setOnAction { _ ->
             hasWon.set(false)
             hasExploded.set(false)
@@ -163,12 +165,10 @@ class PlayMineSweeperGame: Application() {
             secureCount.set(mineLimit)
             gameStarted.set(false)
             timer.reset()
-            with(getGrid()) {
-                gridContainer.children.remove(grid)
-                grid = this
-                gridContainer.children.add(grid)
-            }
-            gridContainer.children.remove(backdrop)
+            grid = Grid(hasExploded, hasWon, secureCount, width)
+            grid.setGame(game)
+            gridContainer.children.clear()
+            gridContainer.children.add(grid)
         }
     }
 }
