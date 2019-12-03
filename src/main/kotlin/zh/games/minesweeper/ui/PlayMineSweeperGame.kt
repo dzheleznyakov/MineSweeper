@@ -3,11 +3,8 @@ package zh.games.minesweeper.ui
 import javafx.application.Application
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleIntegerProperty
-import javafx.collections.FXCollections
-import javafx.collections.ListChangeListener
 import javafx.geometry.Insets
 import javafx.geometry.Pos
-import javafx.scene.Node
 import javafx.scene.Scene
 import javafx.scene.control.Button
 import javafx.scene.control.Label
@@ -21,7 +18,6 @@ import javafx.scene.text.Font
 import javafx.scene.text.FontWeight
 import javafx.scene.text.Text
 import javafx.stage.Stage
-import zh.games.minesweeper.board.Cell
 import zh.games.minesweeper.game.Game
 import zh.games.minesweeper.game.RandomMineSweeperGameInitializer
 import zh.games.minesweeper.game.newMineSweeperGame
@@ -69,8 +65,8 @@ class PlayMineSweeperGame: Application() {
         BorderPane.setAlignment(mineCounter, Pos.CENTER)
         BorderPane.setMargin(mineCounter, Insets(8.0))
 
-        listenToHasExploded(gridContainer)
-        listenToHasWon(gridContainer)
+        listenToHasExploded()
+        listenToHasWon()
         listenToGameStarted()
         listenToStartButtonHit()
 
@@ -81,49 +77,20 @@ class PlayMineSweeperGame: Application() {
         }
     }
 
-    private fun getGrid(): GridPane {
-        val grid = GridPane()
-
-        val toOpenList = FXCollections.observableArrayList<Pair<Int, Int>>()
-
-        getAllCells().map { (i, j) ->
-            Tile(game, i, j, toOpenList, hasExploded, hasWon, secureCount)
-                .apply { GridPane.setMargin(this, Insets(ConfigInstance.tileMarginProperty.get())) }
-        }
-            .forEach(grid::add)
-
-        toOpenList.addListener { change: ListChangeListener.Change<out Pair<Int, Int>> -> with(change) {
-            next()
-            if (wasAdded()) {
-                (from until to).map { list[it] }
-                    .mapNotNull { (row, col) -> grid.children.find { tile: Node -> tile is Tile && tile.col == col && tile.row == row } as Tile }
-                    .forEach { tile ->
-                        tile.openTile()
-                        list.remove(tile.row to tile.col)
-                    }
-            }
-        } }
-        return grid
-    }
-
-    private fun getAllCells() = (1..width)
-        .map { row -> (1..width).map { col -> Cell(row, col) } }
-        .flatten()
-
     private fun getMineCounter() = Label().apply {
         textProperty().bind(secureCount.asString())
         textFill = Color.RED
         font = Font.font("Arial", FontWeight.BOLD, null, 20.0)
     }
 
-    private fun listenToHasExploded(gridContainer: StackPane) {
+    private fun listenToHasExploded() {
         hasExploded.addListener { _, _, newValue ->
             if (newValue) setEndPanel(gridContainer, "Game Over!")
             gameStarted.set(false)
         }
     }
 
-    private fun listenToHasWon(gridContainer: StackPane) {
+    private fun listenToHasWon() {
         hasWon.addListener { _, _, newValue ->
             if (newValue) setEndPanel(gridContainer, "You Won!")
             gameStarted.set(false)
@@ -157,7 +124,7 @@ class PlayMineSweeperGame: Application() {
     }
 
     private fun listenToStartButtonHit() {
-        startBtn.setOnAction { _ ->
+        startBtn.setOnAction {
             hasWon.set(false)
             hasExploded.set(false)
             game = newMineSweeperGame(width, mineLimit, RandomMineSweeperGameInitializer)
