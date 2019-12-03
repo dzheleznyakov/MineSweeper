@@ -1,80 +1,130 @@
 package zh.games.minesweeper.board
 
-import org.junit.Assert
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.FixMethodOrder
 import org.junit.Test
 import org.junit.runners.MethodSorters
-import zh.games.minesweeper.board.Direction.UP
 import zh.games.minesweeper.board.Direction.DOWN
 import zh.games.minesweeper.board.Direction.LEFT
 import zh.games.minesweeper.board.Direction.RIGHT
+import zh.games.minesweeper.board.Direction.UP
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-class TestSquareBoard {
+class TestRectangularBoard {
     @Test
-    fun test00AllCells() {
+    fun test00AllCells_0() {
         val board = createSquareBoard(2)
         val cells = board.getAllCells().sortedWith(compareBy<Cell> { it.i }.thenBy { it.j })
-        Assert.assertEquals("[(1, 1), (1, 2), (2, 1), (2, 2)]", cells.toString())
+        assertEquals("[(1, 1), (1, 2), (2, 1), (2, 2)]", cells.toString())
     }
 
     @Test
-    fun test01Cell() {
+    fun test00AllCells_1() {
+        val board = createRectangularBoard(3, 2)
+        val cells = board.getAllCells().sortedWith(compareBy<Cell> { it.i }.thenBy { it.j })
+        assertEquals("[(1, 1), (1, 2), (2, 1), (2, 2), (3, 1), (3, 2)]", cells.toString())
+    }
+
+    @Test
+    fun test00AllCells_2() {
+        val board = createRectangularBoard(2, 3)
+        val cells = board.getAllCells().sortedWith(compareBy<Cell> { it.i }.thenBy { it.j })
+        assertEquals("[(1, 1), (1, 2), (1, 3), (2, 1), (2, 2), (2, 3)]", cells.toString())
+    }
+
+    @Test
+    fun test01Cell_0() {
         val board = createSquareBoard(2)
         val cell = board.getCellOrNull(1, 2)
-        Assert.assertEquals(1, cell?.i)
-        Assert.assertEquals(2, cell?.j)
+        assertEquals(1, cell?.i)
+        assertEquals(2, cell?.j)
+    }
+
+    @Test
+    fun test01Cell_1() {
+        val board = createRectangularBoard(3, 2)
+        val cell = board.getCellOrNull(3, 1)
+        assertEquals(3, cell?.i)
+        assertEquals(1, cell?.j)
+    }
+
+    @Test
+    fun test01Cell_2() {
+        val board = createRectangularBoard(2, 3)
+        val cell = board.getCellOrNull(2, 3)
+        assertEquals(2, cell?.i)
+        assertEquals(3, cell?.j)
     }
 
     @Test
     fun test02NoCell() {
-        val board = createSquareBoard(2)
-        val cell = board.getCellOrNull(3, 3)
-        Assert.assertEquals(null, cell)
+        val board = createRectangularBoard(2, 3)
+        val cell = board.getCellOrNull(3, 4)
+        assertEquals(null, cell)
     }
 
     @Test
-    fun test03Row() {
-        val board = createSquareBoard(2)
+    fun test03Row_1() {
+        val board = createRectangularBoard(2, 3)
         val row = board.getRow(1, 1..2)
-        Assert.assertEquals("[(1, 1), (1, 2)]", row.toString())
+        assertEquals("[(1, 1), (1, 2)]", row.toString())
+    }
+
+    @Test
+    fun test03Row_2() {
+        val board = createRectangularBoard(2, 3)
+        val row = board.getRow(1, 1..3)
+        assertEquals("[(1, 1), (1, 2), (1, 3)]", row.toString())
     }
 
     @Test
     fun test04RowReversed() {
-        val board = createSquareBoard(2)
+        val board = createRectangularBoard(3, 2)
         val row = board.getRow(1, 2 downTo 1)
-        Assert.assertEquals("[(1, 2), (1, 1)]", row.toString())
+        assertEquals("[(1, 2), (1, 1)]", row.toString())
     }
 
     @Test
     fun test05RowWrongRange() {
-        val board = createSquareBoard(2)
+        val board = createRectangularBoard(3, 2)
         val row = board.getRow(1, 1..10)
-        Assert.assertEquals("[(1, 1), (1, 2)]", row.toString())
+        assertEquals("[(1, 1), (1, 2)]", row.toString())
     }
 
     @Test
-    fun test06Neighbour() {
-        val board = createSquareBoard(2)
+    fun test06Neighbour_0() {
+        val board = createRectangularBoard(2, 3)
         with(board) {
             val cell = getCellOrNull(1, 1)
-            Assert.assertNotNull(cell)
-            Assert.assertEquals(null, cell!!.getNeighbour(UP))
-            Assert.assertEquals(null, cell.getNeighbour(LEFT))
-            Assert.assertEquals("(2, 1)", cell.getNeighbour(DOWN).toString())
-            Assert.assertEquals("(1, 2)", cell.getNeighbour(RIGHT).toString())
+            assertNotNull(cell)
+            assertEquals(null, cell!!.getNeighbour(UP))
+            assertEquals(null, cell.getNeighbour(LEFT))
+            assertEquals("(2, 1)", cell.getNeighbour(DOWN).toString())
+            assertEquals("(1, 2)", cell.getNeighbour(RIGHT).toString())
+        }
+    }
+
+    @Test
+    fun test06Neighbour_1() {
+        val board = createRectangularBoard(2, 3)
+        with(board) {
+            val cell = getCellOrNull(2, 3)
+            assertNotNull(cell)
+            assertEquals("(1, 3)", cell!!.getNeighbour(UP).toString())
+            assertEquals("(2, 2)", cell.getNeighbour(LEFT).toString())
+            assertEquals(null, cell.getNeighbour(DOWN))
+            assertEquals(null, cell.getNeighbour(RIGHT))
         }
     }
 
     @Test
     fun test07AllCells() {
-        val board = createSquareBoard(3)
+        val board = createRectangularBoard(4, 3)
         val cells = board.getAllCells().sortedWith(compareBy<Cell> { it.i }.thenBy { it.j })
-        Assert.assertEquals("Wrong result for 'getAllCells()' for the board of width 3.",
-                "[(1, 1), (1, 2), (1, 3), (2, 1), (2, 2), (2, 3), (3, 1), (3, 2), (3, 3)]",
+        assertEquals("Wrong result for 'getAllCells()' for the board of width 3.",
+                "[(1, 1), (1, 2), (1, 3), (2, 1), (2, 2), (2, 3), (3, 1), (3, 2), (3, 3), (4, 1), (4, 2), (4, 3)]",
                 cells.toString())
     }
 
@@ -82,49 +132,49 @@ class TestSquareBoard {
     fun test08Cell() {
         val board = createSquareBoard(4)
         val cell = board.getCellOrNull(2, 3)
-        Assert.assertEquals("The board of width 4 should contain the cell (2, 3).",
+        assertEquals("The board of width 4 should contain the cell (2, 3).",
                 "(2, 3)", cell.toString())
     }
 
     @Test
     fun test09NoCell() {
-        val board = createSquareBoard(4)
+        val board = createRectangularBoard(4, 5)
         val cell = board.getCellOrNull(10, 10)
-        Assert.assertEquals("The board of width 4 should contain the cell (10, 10).", null, cell)
+        assertEquals("The board of width 4 should contain the cell (10, 10).", null, cell)
     }
 
     @Test
     fun test10Row() {
         val row = createSquareBoard(4).getRow(1, 1..2)
-        Assert.assertEquals("Wrong row for 'createSquareBoard(4).getRow(1, 1..2)'.",
+        assertEquals("Wrong row for 'createSquareBoard(4).getRow(1, 1..2)'.",
                 "[(1, 1), (1, 2)]", row.toString())
     }
 
     @Test
     fun test11Column() {
         val row = createSquareBoard(4).getColumn(1..2, 3)
-        Assert.assertEquals("Wrong column for 'createSquareBoard(4).getColumn(1..2, 3)'.",
+        assertEquals("Wrong column for 'createSquareBoard(4).getColumn(1..2, 3)'.",
                 "[(1, 3), (2, 3)]", row.toString())
     }
 
     @Test
     fun test12RowReversedRange() {
         val row = createSquareBoard(4).getRow(1, 4 downTo 1)
-        Assert.assertEquals("Wrong column for 'createSquareBoard(4).getRow(1, 4 downTo 1)'.",
+        assertEquals("Wrong column for 'createSquareBoard(4).getRow(1, 4 downTo 1)'.",
                 "[(1, 4), (1, 3), (1, 2), (1, 1)]", row.toString())
     }
 
     @Test
     fun test13ColumnReversedRange() {
         val row = createSquareBoard(4).getColumn(2 downTo 1, 3)
-        Assert.assertEquals("Wrong column for 'createSquareBoard(4).getColumn(2 downTo 1, 3)'.",
+        assertEquals("Wrong column for 'createSquareBoard(4).getColumn(2 downTo 1, 3)'.",
                 "[(2, 3), (1, 3)]", row.toString())
     }
 
     @Test
     fun test14ColumnWrongRange() {
         val row = createSquareBoard(4).getColumn(3..6, 2)
-        Assert.assertEquals("Wrong column for 'createSquareBoard(4).getColumn(3..6, 2)'.",
+        assertEquals("Wrong column for 'createSquareBoard(4).getColumn(3..6, 2)'.",
                 "[(3, 2), (4, 2)]", row.toString())
     }
 
@@ -135,11 +185,11 @@ class TestSquareBoard {
     fun test15Neighbour() {
         with(createSquareBoard(4)) {
             val cell = getCellOrNull(2, 3)
-            Assert.assertNotNull("The board of width 4 should contain the cell (2, 3).", cell)
-            Assert.assertEquals(neighbourMessage(cell!!, UP), "(1, 3)", cell.getNeighbour(UP).toString())
-            Assert.assertEquals(neighbourMessage(cell, DOWN), "(3, 3)", cell.getNeighbour(DOWN).toString())
-            Assert.assertEquals(neighbourMessage(cell, LEFT), "(2, 2)", cell.getNeighbour(LEFT).toString())
-            Assert.assertEquals(neighbourMessage(cell, RIGHT), "(2, 4)", cell.getNeighbour(RIGHT).toString())
+            assertNotNull("The board of width 4 should contain the cell (2, 3).", cell)
+            assertEquals(neighbourMessage(cell!!, UP), "(1, 3)", cell.getNeighbour(UP).toString())
+            assertEquals(neighbourMessage(cell, DOWN), "(3, 3)", cell.getNeighbour(DOWN).toString())
+            assertEquals(neighbourMessage(cell, LEFT), "(2, 2)", cell.getNeighbour(LEFT).toString())
+            assertEquals(neighbourMessage(cell, RIGHT), "(2, 4)", cell.getNeighbour(RIGHT).toString())
         }
     }
 
@@ -147,11 +197,11 @@ class TestSquareBoard {
     fun test16NullableNeighbour() {
         with(createSquareBoard(4)) {
             val cell = getCellOrNull(4, 4)
-            Assert.assertNotNull("The board of width 4 should contain the cell (4, 4).", cell)
-            Assert.assertEquals(neighbourMessage(cell!!, UP), "(3, 4)", cell.getNeighbour(UP).toString())
-            Assert.assertEquals(neighbourMessage(cell, LEFT), "(4, 3)", cell.getNeighbour(LEFT).toString())
-            Assert.assertEquals(neighbourMessage(cell, DOWN), null, cell.getNeighbour(DOWN))
-            Assert.assertEquals(neighbourMessage(cell, RIGHT), null, cell.getNeighbour(RIGHT))
+            assertNotNull("The board of width 4 should contain the cell (4, 4).", cell)
+            assertEquals(neighbourMessage(cell!!, UP), "(3, 4)", cell.getNeighbour(UP).toString())
+            assertEquals(neighbourMessage(cell, LEFT), "(4, 3)", cell.getNeighbour(LEFT).toString())
+            assertEquals(neighbourMessage(cell, DOWN), null, cell.getNeighbour(DOWN))
+            assertEquals(neighbourMessage(cell, RIGHT), null, cell.getNeighbour(RIGHT))
         }
     }
 

@@ -30,9 +30,10 @@ class PlayMineSweeperGame: Application() {
         }
     }
 
-    private val width = 10
-    private val mineLimit = 10
-    private var game: Game = newMineSweeperGame(width, mineLimit, RandomMineSweeperGameInitializer)
+    private val height = 16
+    private val width = 30
+    private val mineLimit = 99
+    private var game: Game = newMineSweeperGame(height, width, mineLimit, RandomMineSweeperGameInitializer)
     private val hasExploded = SimpleBooleanProperty(false)
     private val hasWon = SimpleBooleanProperty(false)
     private val secureCount = SimpleIntegerProperty(mineLimit)
@@ -40,7 +41,7 @@ class PlayMineSweeperGame: Application() {
 
     private val backdrop = StackPane()
     private val gridContainer = StackPane()
-    private var grid = Grid(hasExploded, hasWon, secureCount, width)
+    private var grid = Grid(hasExploded, hasWon, secureCount, height, width)
 
     private val timer: Timer = Timer()
     private val startBtn: Button = Button("Start")
@@ -127,12 +128,12 @@ class PlayMineSweeperGame: Application() {
         startBtn.setOnAction {
             hasWon.set(false)
             hasExploded.set(false)
-            game = newMineSweeperGame(width, mineLimit, RandomMineSweeperGameInitializer)
+            game = newMineSweeperGame(height, width, mineLimit, RandomMineSweeperGameInitializer)
                 .apply { initialize() }
             secureCount.set(mineLimit)
             gameStarted.set(false)
             timer.reset()
-            grid = Grid(hasExploded, hasWon, secureCount, width)
+            grid = Grid(hasExploded, hasWon, secureCount, height, width)
             grid.setGame(game)
             gridContainer.children.clear()
             gridContainer.children.add(grid)
@@ -140,4 +141,4 @@ class PlayMineSweeperGame: Application() {
     }
 }
 
-fun GridPane.add(tile: Tile) = add(tile, tile.row, tile.col)
+fun GridPane.add(tile: Tile) = add(tile, tile.col, tile.row)

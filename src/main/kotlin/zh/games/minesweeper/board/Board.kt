@@ -19,8 +19,9 @@ enum class Status {
     SECURED, CLOSED, OPEN
 }
 
-interface SquareBoard {
+interface RectangularBoard {
     val width: Int
+    val height: Int
 
     fun getCellOrNull(i: Int, j: Int): Cell?
     fun getCell(i: Int, j: Int): Cell
@@ -34,7 +35,7 @@ interface SquareBoard {
     fun Cell.getNeighbours(): List<Cell>
 }
 
-interface GameBoard<T> : SquareBoard {
+interface GameBoard<T> : RectangularBoard {
     operator fun get(cell: Cell): T?
     operator fun set(cell: Cell, value: T?)
 

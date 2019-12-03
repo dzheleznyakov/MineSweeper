@@ -14,6 +14,7 @@ class Grid(
     private val hasExploded: SimpleBooleanProperty,
     private val hasWon: SimpleBooleanProperty,
     private val secureCount: SimpleIntegerProperty,
+    private val height: Int,
     private val width: Int
 ) : GridPane() {
     private val toOpenList = FXCollections.observableArrayList<Pair<Int, Int>>()
@@ -31,7 +32,7 @@ class Grid(
         toOpenList.addListener(toOpenListListener)
     }
 
-    private fun getAllCells() = (1..width)
+    private fun getAllCells() = (1..height)
         .map { row -> (1..width).map { col -> Cell(row, col) } }
         .flatten()
 

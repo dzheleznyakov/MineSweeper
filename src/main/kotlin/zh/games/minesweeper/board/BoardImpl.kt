@@ -4,47 +4,49 @@ import zh.games.minesweeper.board.Direction.UP
 import zh.games.minesweeper.board.Direction.DOWN
 import zh.games.minesweeper.board.Direction.LEFT
 
-fun createSquareBoard(width: Int): SquareBoard = SquareBoardImpl(width)
+fun createRectangularBoard(height: Int, width: Int): RectangularBoard = RectangularBoardImpl(height, width)
+fun createSquareBoard(width: Int): RectangularBoard = RectangularBoardImpl(width)
 fun <T> createGameBoard(width: Int): GameBoard<T> = GameBoardImpl(createSquareBoard(width))
+fun <T> createGameBoard(height: Int, width: Int): GameBoard<T> = GameBoardImpl(createRectangularBoard(height, width))
 fun createMineSweeperBoard(width: Int, mineLimit: Int): MineSweeperBoard = MineSweeperBoardImpl(createGameBoard(width), mineLimit)
+fun createMineSweeperBoard(height: Int, width: Int, mineLimit: Int): MineSweeperBoard = MineSweeperBoardImpl(createGameBoard(height, width), mineLimit)
 
-private class SquareBoardImpl(override val width: Int) : SquareBoard {
+private open class RectangularBoardImpl(override val height: Int, override val width: Int) : RectangularBoard {
     private val board: List<List<Cell>>
 
     init {
         require(width > 0) { "Width should be greater than zero" }
-        board = (1 .. width)
-                .map { i -> (1 .. width).map { j -> Cell(i, j) }.toList() }
-                .toList()
+        require(height > 0) { "Height should be greater than zero" }
+        board = (1 .. height)
+            .map { i -> (1 .. width).map { j -> Cell(i, j) }.toList() }
+            .toList()
     }
 
+    constructor(width: Int) : this(width, width)
+
     override fun getCellOrNull(i: Int, j: Int): Cell? = when {
-        i < 1 || i > width -> null
+        i < 1 || i > height -> null
         j < 1 || j > width -> null
         else -> board[i - 1][j - 1]
     }
 
-    override fun getCell(i: Int, j: Int): Cell {
-        val cell = getCellOrNull(i, j)
-        require(cell != null) { "Illegal coordinates: ($i, $j)" }
-        return cell
-    }
+    override fun getCell(i: Int, j: Int): Cell =
+        getCellOrNull(i, j) ?: throw IllegalArgumentException("Illegal coordinates: ($i, $j)")
 
-    override fun getAllCells(): Collection<Cell> = (1..width)
-            .flatMap { i -> getRow(i, 1..width) }
-            .toList()
+    override fun getAllCells(): Collection<Cell> = (1..height)
+        .flatMap { i -> getRow(i, 1..width) }
+        .toList()
 
     override fun getRow(i: Int, jRange: IntProgression): List<Cell> {
-        require(i in 1..width) { "i should be between 1 and $width (inclusively)" }
+        require(i in 1..height) { "i should be between 1 and $height (inclusively)" }
         return jRange.mapNotNull { j -> getCellOrNull(i, j) }
-                .toList()
+            .toList()
     }
 
     override fun getColumn(iRange: IntProgression, j: Int): List<Cell> {
         require(j in 1..width) { "j should be between 1 and $width (inclusively)" }
-        return iRange.map { i -> getCellOrNull(i, j) }
-                .filterNotNull()
-                .toList()
+        return iRange.mapNotNull { i -> getCellOrNull(i, j) }
+            .toList()
     }
 
     override fun Cell.getNeighbour(direction: Direction): Cell? = when (direction) {
@@ -65,7 +67,7 @@ private class SquareBoardImpl(override val width: Int) : SquareBoard {
         .toList()
 }
 
-private class GameBoardImpl<T>(val sqBoard: SquareBoard) : GameBoard<T>, SquareBoard by sqBoard {
+private class GameBoardImpl<T>(val reqBoard: RectangularBoard) : GameBoard<T>, RectangularBoard by reqBoard {
     private var contentMap: Map<Cell, T?> = mapOf()
 
     override fun get(cell: Cell): T? = contentMap[cell]

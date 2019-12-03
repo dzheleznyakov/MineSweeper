@@ -6,14 +6,18 @@ import zh.games.minesweeper.board.Status
 import zh.games.minesweeper.board.createMineSweeperBoard
 
 fun newMineSweeperGame(width: Int = 10, mineLimit: Int = 10, initializer: MineSweeperGameInitializer): Game
-        = MineSweeperGame(width, mineLimit, initializer)
+        = MineSweeperGame(width, width, mineLimit, initializer)
+
+fun newMineSweeperGame(height: Int = 10, width: Int = 10, mineLimit: Int = 10, initializer: MineSweeperGameInitializer): Game
+        = MineSweeperGame(height, width, mineLimit, initializer)
 
 class MineSweeperGame(
+    height: Int,
     width: Int,
     private val mineLimit: Int,
     private val initializer: MineSweeperGameInitializer
 ) : Game {
-    private val board = createMineSweeperBoard(width, mineLimit)
+    private val board = createMineSweeperBoard(height, width, mineLimit)
 
     override fun initialize() {
         repeat(mineLimit) {
