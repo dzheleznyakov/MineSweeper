@@ -8,9 +8,11 @@ import javafx.geometry.Pos
 import javafx.scene.Scene
 import javafx.scene.control.Button
 import javafx.scene.control.Label
+import javafx.scene.control.MenuBar
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.GridPane
 import javafx.scene.layout.HBox
+import javafx.scene.layout.Pane
 import javafx.scene.layout.StackPane
 import javafx.scene.paint.Color
 import javafx.scene.shape.Rectangle
@@ -18,7 +20,6 @@ import javafx.scene.text.Font
 import javafx.scene.text.FontWeight
 import javafx.scene.text.Text
 import javafx.stage.Stage
-import zh.games.minesweeper.game.Game
 import zh.games.minesweeper.game.RandomMineSweeperGameInitializer
 import zh.games.minesweeper.game.newMineSweeperGame
 
@@ -30,38 +31,44 @@ class PlayMineSweeperGame: Application() {
         }
     }
 
-    private val height = 16
-    private val width = 30
-    private val mineLimit = 99
-    private var game: Game = newMineSweeperGame(height, width, mineLimit, RandomMineSweeperGameInitializer)
+    private val settingsMenu = SettingsMenu()
+    private var height = SimpleIntegerProperty().apply { bind(settingsMenu.height) }
+    private var width = SimpleIntegerProperty().apply { bind(settingsMenu.width) }
+    private val mineLimit = SimpleIntegerProperty().apply { bind(settingsMenu.mineLimit) }
     private val hasExploded = SimpleBooleanProperty(false)
     private val hasWon = SimpleBooleanProperty(false)
-    private val secureCount = SimpleIntegerProperty(mineLimit)
+    private val secureCount = SimpleIntegerProperty(mineLimit.get())
     private val gameStarted = SimpleBooleanProperty(false)
 
     private val backdrop = StackPane()
     private val gridContainer = StackPane()
-    private var grid = Grid(hasExploded, hasWon, secureCount, height, width)
 
     private val timer: Timer = Timer()
     private val startBtn: Button = Button("Start")
 
-    override fun init() {
-        game.initialize()
-    }
-
     override fun start(stage: Stage) {
+        val menuBar = MenuBar().apply {
+            useSystemMenuBarProperty().set(true)
+            menus.add(settingsMenu)
+        }
+
         val mineCounter = getMineCounter()
         val statContainer = HBox(10.0, mineCounter, startBtn, timer)
             .apply { alignment = Pos.CENTER }
 
-        grid.setGame(game)
-        gridContainer.children.add(grid)
-        gridContainer.setOnMouseClicked { _ -> if (!gameStarted.get()) gameStarted.set(true) }
+        val game = newMineSweeperGame(height.get(), width.get(), mineLimit.get(), RandomMineSweeperGameInitializer)
+            .apply { initialize() }
+        val grid = Grid(hasExploded, hasWon, secureCount, height.get(), width.get())
+            .apply { setGame(game) }
+        with(gridContainer) {
+            children.add(grid)
+            setOnMouseClicked { if (!gameStarted.get()) gameStarted.set(true) }
+        }
 
         val root = BorderPane().apply {
             top = statContainer
             center = gridContainer
+            left = Pane(menuBar)
         }
         BorderPane.setAlignment(mineCounter, Pos.CENTER)
         BorderPane.setMargin(mineCounter, Insets(8.0))
@@ -128,15 +135,17 @@ class PlayMineSweeperGame: Application() {
         startBtn.setOnAction {
             hasWon.set(false)
             hasExploded.set(false)
-            game = newMineSweeperGame(height, width, mineLimit, RandomMineSweeperGameInitializer)
+            val game = newMineSweeperGame(height.get(), width.get(), mineLimit.get(), RandomMineSweeperGameInitializer)
                 .apply { initialize() }
-            secureCount.set(mineLimit)
+            secureCount.set(mineLimit.get())
             gameStarted.set(false)
             timer.reset()
-            grid = Grid(hasExploded, hasWon, secureCount, height, width)
-            grid.setGame(game)
-            gridContainer.children.clear()
-            gridContainer.children.add(grid)
+            val grid = Grid(hasExploded, hasWon, secureCount, height.get(), width.get())
+                .apply { setGame(game) }
+            with(gridContainer.children) {
+                clear()
+                add(grid)
+            }
         }
     }
 }
